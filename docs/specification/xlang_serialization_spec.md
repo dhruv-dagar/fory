@@ -879,8 +879,51 @@ Field names:
   32-bit field-ID type; the extended form still writes `tag_id - 15` with the
   existing `varuint32` encoding.
 - Otherwise, write the encoded field name bytes as a meta string.
-- For xlang, field names are converted to `snake_case` before encoding for
-  cross-language compatibility.
+- For xlang, field names MUST be converted using the canonical algorithm below
+  before encoding for cross-language compatibility. The same normalized name MUST
+  be used for wire metadata, name-based field ordering, and schema fingerprints.
+
+#### Canonical field-name normalization
+
+The canonical xlang field-name normalization is ASCII-only and deterministic. It
+preserves existing underscores and all non-ASCII code points, and lowercases only
+ASCII letters (`A` through `Z`). It inserts an underscore before an ASCII uppercase
+letter when either:
+
+1. The preceding character is an ASCII lowercase letter or digit; or
+2. The preceding character is an ASCII uppercase letter and the following character
+   is an ASCII lowercase letter (the boundary between an acronym and a word).
+
+A leading uppercase run does not produce a leading underscore. No other characters
+are inserted, removed, or normalized. In particular, this algorithm does not use
+locale-sensitive casing or Unicode case folding.
+
+Known-answer vectors (input → normalized name):
+
+| Input | Normalized name |
+| --- | --- |
+| `id` | `id` |
+| `createdAt` | `created_at` |
+| `CreatedAt` | `created_at` |
+| `fooURL` | `foo_url` |
+| `URLValue` | `url_value` |
+| `HTTP2Server` | `http2_server` |
+| `x2Y` | `x2_y` |
+| `already_snake` | `already_snake` |
+| `fooÖl` | `fooÖl` |
+
+Implementations MUST use these same results for the wire field name, the fallback
+field identifier used for ordering, and the field identifier included in schema
+fingerprints. Implementations MUST detect a collision when two distinct declared
+field names in the same type normalize to the same field name, unless the fields
+have distinct explicit tag IDs and the relevant encoding uses those IDs for
+identity; silent last-write-wins behavior is not permitted.
+
+**Compatibility:** changing a previously emitted field name changes TypeDef metadata
+and may change field ordering and schema fingerprints. Implementations adopting this
+algorithm MUST account for compatibility with data produced by older versions; the
+normalization change MUST NOT be presented as wire-compatible with legacy names such
+as `foo_u_r_l` or `_u_r_l_value`.
 
 Field order:
 
