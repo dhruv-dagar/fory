@@ -976,34 +976,33 @@ export class TypeMeta {
     return result;
   }
 
-  static lowerCamelToLowerUnderscore(lowerCamel: string) {
-    if (lowerCamel === "__proto__") {
-      return lowerCamel;
+  static lowerCamelToLowerUnderscore(name: string) {
+    // Preserve this special property name: it is not an ordinary user field.
+    if (name === "__proto__") {
+      return name;
     }
-    let result = "";
-    const length = lowerCamel.length;
-    let fromIndex = 0;
-
-    for (let i = 0; i < length; i++) {
-      const symbol = lowerCamel.charAt(i);
-
-      // 检查是否为大写字母
-      if (symbol >= "A" && symbol <= "Z") {
-        // 拼接从上一个索引到当前大写字母前的部分，加下划线，加小写化后的字母
-        result += lowerCamel.substring(fromIndex, i);
-        result += "_";
-        result += symbol.toLowerCase();
-        // 更新起始索引
-        fromIndex = i + 1;
+    const chars = Array.from(name);
+    const result: string[] = [];
+    for (let i = 0; i < chars.length; i++) {
+      const current = chars[i];
+      if (current >= "A" && current <= "Z") {
+        if (i > 0) {
+          const previous = chars[i - 1];
+          const previousLowerOrDigit =
+            (previous >= "a" && previous <= "z") || (previous >= "0" && previous <= "9");
+          const previousUpper = previous >= "A" && previous <= "Z";
+          const next = chars[i + 1];
+          const nextLower = next !== undefined && next >= "a" && next <= "z";
+          if (previousLowerOrDigit || (previousUpper && nextLower)) {
+            result.push("_");
+          }
+        }
+        result.push(current.toLowerCase());
+      } else {
+        result.push(current);
       }
     }
-
-    // 处理剩余部分
-    if (fromIndex < length) {
-      result += lowerCamel.substring(fromIndex, length);
-    }
-
-    return result;
+    return result.join("");
   }
 
   private static buildHeader(buffer: Uint8Array, isCompressed: boolean) {
