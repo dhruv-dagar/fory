@@ -114,9 +114,11 @@ pub fn to_snake_case(name: &str) -> String {
     for (i, &c) in chars.iter().enumerate() {
         if c.is_ascii_uppercase() {
             if i > 0 {
-                let prev_upper = chars.get(i - 1).is_some_and(|c| c.is_ascii_uppercase());
-                let next_upper_or_end = chars.get(i + 1).map_or(true, |c| c.is_ascii_uppercase());
-                if !prev_upper || !next_upper_or_end {
+                let previous = chars[i - 1];
+                let previous_lower_or_digit = previous.is_ascii_lowercase() || previous.is_ascii_digit();
+                let previous_upper = previous.is_ascii_uppercase();
+                let next_lower = chars.get(i + 1).is_some_and(|next| next.is_ascii_lowercase());
+                if previous_lower_or_digit || (previous_upper && next_lower) {
                     result.push('_');
                 }
             }
