@@ -1477,63 +1477,30 @@ int64_t TypeMeta::compute_hash(const std::vector<uint8_t> &meta_bytes) {
 namespace {
 
 std::string to_snake_case(const std::string &name) {
-  bool all_lower = true;
-  for (char c : name) {
-    unsigned char uc = static_cast<unsigned char>(c);
-    if (!(static_cast<bool>(std::islower(uc)) ||
-          static_cast<bool>(std::isdigit(uc)) || c == '_')) {
-      all_lower = false;
-      break;
-    }
-  }
-  if (all_lower) {
-    return name;
-  }
-
   std::string result;
-  result.reserve(name.size() * 2);
-  std::optional<char> prev;
+  result.reserve(name.size() + 4);
+
+  auto is_upper = [](char c) { return c >= 'A' && c <= 'Z'; };
+  auto is_lower = [](char c) { return c >= 'a' && c <= 'z'; };
+  auto is_digit = [](char c) { return c >= '0' && c <= '9'; };
 
   for (size_t i = 0; i < name.size(); ++i) {
     char ch = name[i];
-    if (ch == '_') {
-      result.push_back('_');
-      prev = ch;
-      continue;
-    }
-
-    if (static_cast<bool>(std::isupper(static_cast<unsigned char>(ch)))) {
-      bool need_underscore = false;
-      if (prev.has_value()) {
-        char prev_ch = *prev;
-        bool prev_lower_or_digit = static_cast<bool>(
-            std::islower(static_cast<unsigned char>(prev_ch)) ||
-            std::isdigit(static_cast<unsigned char>(prev_ch)));
-        bool prev_upper = static_cast<bool>(
-            std::isupper(static_cast<unsigned char>(prev_ch)));
-
-        bool next_is_lower = false;
-        if (i + 1 < name.size()) {
-          char next = name[i + 1];
-          next_is_lower =
-              static_cast<bool>(std::islower(static_cast<unsigned char>(next)));
-        }
-
-        if (prev_lower_or_digit || (prev_upper && next_is_lower)) {
-          need_underscore = true;
+    if (is_upper(ch)) {
+      if (i > 0) {
+        char previous = name[i - 1];
+        bool previous_lower_or_digit = is_lower(previous) || is_digit(previous);
+        bool previous_upper = is_upper(previous);
+        bool next_lower = i + 1 < name.size() && is_lower(name[i + 1]);
+        if (previous_lower_or_digit || (previous_upper && next_lower)) {
+          result.push_back('_');
         }
       }
-      if (need_underscore && !result.empty() && result.back() != '_') {
-        result.push_back('_');
-      }
-      result.push_back(
-          static_cast<char>(std::tolower(static_cast<unsigned char>(ch))));
+      result.push_back(static_cast<char>(ch - 'A' + 'a'));
     } else {
       result.push_back(ch);
     }
-    prev = ch;
   }
-
   return result;
 }
 
