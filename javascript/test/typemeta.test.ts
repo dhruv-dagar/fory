@@ -140,6 +140,24 @@ function replaceFirstBytesWithDifferentLength(
 }
 
 describe("typemeta", () => {
+  test("uses canonical xlang field-name normalization", () => {
+    const vectors: Array<[string, string]> = [
+      ["id", "id"],
+      ["createdAt", "created_at"],
+      ["CreatedAt", "created_at"],
+      ["fooURL", "foo_url"],
+      ["URLValue", "url_value"],
+      ["HTTP2Server", "http2_server"],
+      ["x2Y", "x2_y"],
+      ["already_snake", "already_snake"],
+      ["fooÖl", "fooÖl"],
+    ];
+    for (const [input, expected] of vectors) {
+      expect(TypeMeta.lowerCamelToLowerUnderscore(input)).toBe(expected);
+      expect(TypeMeta.toSnakeCase(input)).toBe(expected);
+    }
+  });
+
   test.each([false, true])(
     "reuses overflow metadata slots across roots (registered=%s)",
     (registered) => {
