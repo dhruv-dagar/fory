@@ -674,6 +674,13 @@ mod case_tests {
         assert_eq!(to_snake_case("simpleTest"), "simple_test");
         assert_eq!(to_snake_case("already_snake"), "already_snake");
         assert_eq!(to_snake_case("ABC"), "abc");
+        assert_eq!(to_snake_case("fooURL"), "foo_url");
+        assert_eq!(to_snake_case("URLValue"), "url_value");
+        assert_eq!(to_snake_case("HTTP2Server"), "http2_server");
+        assert_eq!(to_snake_case("CreatedAt"), "created_at");
+        assert_eq!(to_snake_case("x2Y"), "x2_y");
+        assert_eq!(to_snake_case("already_snake"), "already_snake");
+        assert_eq!(to_snake_case("fooÖl"), "fooÖl");
     }
 
     #[test]
