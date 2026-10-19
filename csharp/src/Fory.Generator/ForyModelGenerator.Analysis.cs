@@ -2811,20 +2811,23 @@ public sealed partial class ForyModelGenerator
         for (int i = 0; i < name.Length; i++)
         {
             char c = name[i];
-            if (char.IsUpper(c))
+            bool isUpper = c >= 'A' && c <= 'Z';
+            if (isUpper)
             {
                 if (i > 0)
                 {
-                    bool prevUpper = char.IsUpper(name[i - 1]);
-                    bool nextUpperOrEnd = i + 1 >= name.Length || char.IsUpper(name[i + 1]);
-                    bool leadingPascalBoundary = i == 1 && prevUpper && !nextUpperOrEnd;
-                    if ((!prevUpper || !nextUpperOrEnd) && !leadingPascalBoundary)
+                    char previous = name[i - 1];
+                    bool previousLowerOrDigit =
+                        (previous >= 'a' && previous <= 'z') || (previous >= '0' && previous <= '9');
+                    bool previousUpper = previous >= 'A' && previous <= 'Z';
+                    bool nextLower = i + 1 < name.Length && name[i + 1] >= 'a' && name[i + 1] <= 'z';
+                    if (previousLowerOrDigit || (previousUpper && nextLower))
                     {
                         sb.Append('_');
                     }
                 }
 
-                sb.Append(char.ToLowerInvariant(c));
+                sb.Append((char)(c - 'A' + 'a'));
             }
             else
             {
