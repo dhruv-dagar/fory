@@ -451,7 +451,7 @@ impl FieldInfo {
         FieldInfo {
             field_id: -1,
             matched_field_id: -1,
-            field_name: field_name.to_string(),
+            field_name: to_snake_case(field_name),
             field_type,
         }
     }
@@ -460,7 +460,7 @@ impl FieldInfo {
         FieldInfo {
             field_id,
             matched_field_id: -1,
-            field_name: field_name.to_string(),
+            field_name: to_snake_case(field_name),
             field_type,
         }
     }
