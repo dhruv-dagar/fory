@@ -914,10 +914,8 @@ Known-answer vectors (input → normalized name):
 
 Implementations MUST use these same results for the wire field name, the fallback
 field identifier used for ordering, and the field identifier included in schema
-fingerprints. Implementations MUST detect a collision when two distinct declared
-field names in the same type normalize to the same field name, unless the fields
-have distinct explicit tag IDs and the relevant encoding uses those IDs for
-identity; silent last-write-wins behavior is not permitted.
+fingerprints. Because normalization is not injective, schemas should avoid declaring
+distinct fields whose names normalize to the same value.
 
 **Compatibility:** changing a previously emitted field name changes TypeDef metadata
 and may change field ordering and schema fingerprints. Implementations adopting this
