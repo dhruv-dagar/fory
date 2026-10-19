@@ -51,6 +51,25 @@ TYPENAME_ENCODER = MetaStringEncoder("$", "_")
 FIELD_NAME_ENCODER = MetaStringEncoder("$", "_")
 
 
+def _normalize_field_name(name: str) -> str:
+    """Apply the canonical ASCII-only xlang field-name normalization."""
+    result = []
+    for index, char in enumerate(name):
+        if "A" <= char <= "Z":
+            if index > 0:
+                previous = name[index - 1]
+                previous_lower_or_digit = ("a" <= previous <= "z") or ("0" <= previous <= "9")
+                previous_upper = "A" <= previous <= "Z"
+                next_lower = index + 1 < len(name) and "a" <= name[index + 1] <= "z"
+                if previous_lower_or_digit or (previous_upper and next_lower):
+                    result.append("_")
+            result.append(chr(ord(char) + ord("a") - ord("A")))
+        else:
+            result.append(char)
+    return "".join(result)
+
+
+
 def encode_typedef(type_resolver, cls, include_fields: bool = True):
     """
     Encode the typedef of the type for xlang serialization.
@@ -243,8 +262,9 @@ def write_field_info(buffer: Buffer, field_info: FieldInfo):
         field_info.field_type.write(buffer, False)
     else:
         # Field name encoding
-        encoding = FIELD_NAME_ENCODER.compute_encoding(field_info.name, FIELD_NAME_ENCODINGS)
-        meta_string = FIELD_NAME_ENCODER.encode_with_encoding(field_info.name, encoding)
+        wire_name = _normalize_field_name(field_info.name)
+        encoding = FIELD_NAME_ENCODER.compute_encoding(wire_name, FIELD_NAME_ENCODINGS)
+        meta_string = FIELD_NAME_ENCODER.encode_with_encoding(wire_name, encoding)
         # Store (length - 1) in size field, matching Java TypeDefEncoder
         field_name_binary_size = len(meta_string.encoded_data) - 1
         encoding_flags = FIELD_NAME_ENCODINGS.index(meta_string.encoding)
