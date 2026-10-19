@@ -3696,5 +3696,29 @@ private func findTopLevelSeparatorIndex(in content: String, separator: Character
 }
 
 private func toSnakeCase(_ name: String) -> String {
-    return lowerCamelToLowerUnderscore(name)
+    let scalars = Array(name.unicodeScalars)
+    var result = String()
+    result.reserveCapacity(name.count + 4)
+
+    for (index, scalar) in scalars.enumerated() {
+        let current = scalar.value
+        if current >= 65 && current <= 90 {
+            if index > 0 {
+                let previous = scalars[index - 1].value
+                let previousLowerOrDigit =
+                    (previous >= 97 && previous <= 122) ||
+                    (previous >= 48 && previous <= 57)
+                let previousUpper = previous >= 65 && previous <= 90
+                let next = index + 1 < scalars.count ? scalars[index + 1].value : 0
+                let nextLower = next >= 97 && next <= 122
+                if previousLowerOrDigit || (previousUpper && nextLower) {
+                    result.append("_")
+                }
+            }
+            result.unicodeScalars.append(UnicodeScalar(current + 32)!)
+        } else {
+            result.unicodeScalars.append(scalar)
+        }
+    }
+    return result
 }
