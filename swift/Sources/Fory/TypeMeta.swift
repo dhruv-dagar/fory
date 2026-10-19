@@ -1121,29 +1121,28 @@ fileprivate extension TypeMeta.FieldType {
 }
 
 private func lowerCamelToLowerUnderscore(_ name: String) -> String {
-    let chars = Array(name)
+    let scalars = Array(name.unicodeScalars)
     var result = String()
     result.reserveCapacity(name.count + 4)
 
-    for (index, char) in chars.enumerated() {
-        if let scalar = char.unicodeScalars.first,
-           scalar.value >= 65, scalar.value <= 90 {
+    for (index, scalar) in scalars.enumerated() {
+        let current = scalar.value
+        if current >= 65 && current <= 90 {
             if index > 0 {
-                let previous = chars[index - 1]
-                let previousValue = previous.unicodeScalars.first?.value ?? 0
+                let previous = scalars[index - 1].value
                 let previousLowerOrDigit =
-                    (previousValue >= 97 && previousValue <= 122) ||
-                    (previousValue >= 48 && previousValue <= 57)
-                let previousUpper = previousValue >= 65 && previousValue <= 90
-                let nextValue = index + 1 < chars.count ? (chars[index + 1].unicodeScalars.first?.value ?? 0) : 0
-                let nextLower = nextValue >= 97 && nextValue <= 122
+                    (previous >= 97 && previous <= 122) ||
+                    (previous >= 48 && previous <= 57)
+                let previousUpper = previous >= 65 && previous <= 90
+                let next = index + 1 < scalars.count ? scalars[index + 1].value : 0
+                let nextLower = next >= 97 && next <= 122
                 if previousLowerOrDigit || (previousUpper && nextLower) {
                     result.append("_")
                 }
             }
-            result.append(Character(UnicodeScalar(scalar.value + 32)!))
+            result.unicodeScalars.append(UnicodeScalar(current + 32)!)
         } else {
-            result.append(char)
+            result.unicodeScalars.append(scalar)
         }
     }
     return result
