@@ -270,7 +270,7 @@ constexpr size_t snake_case_length(std::string_view name) {
   size_t length = 0;
   for (size_t i = 0; i < name.size(); ++i) {
     char c = name[i];
-    if (c == '_' || c == '-') {
+    if (c == '_') {
       ++length;
       continue;
     }
@@ -289,7 +289,7 @@ to_snake_case(std::string_view name) {
   size_t pos = 0;
   for (size_t i = 0; i < name.size(); ++i) {
     char c = name[i];
-    if (c == '_' || c == '-') {
+    if (c == '_') {
       buffer[pos++] = '_';
       continue;
     }
