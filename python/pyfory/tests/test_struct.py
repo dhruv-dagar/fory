@@ -33,6 +33,7 @@ except ImportError:
 
 import pyfory
 from pyfory import Fory
+from pyfory.struct import _to_snake_case
 from pyfory.error import ForyInvalidDataError, TypeNotCompatibleError, TypeUnregisteredError
 from pyfory.resolver import NOT_NULL_VALUE_FLAG, REF_VALUE_FLAG
 from pyfory.serializer import FixedInt32Serializer
@@ -779,6 +780,22 @@ def test_tagged_non_primitive_fields_sort_by_identifier():
         "middle_map",
         "early_string",
     ]
+
+
+def test_canonical_xlang_field_name_normalization():
+    vectors = {
+        "id": "id",
+        "createdAt": "created_at",
+        "CreatedAt": "created_at",
+        "fooURL": "foo_url",
+        "URLValue": "url_value",
+        "HTTP2Server": "http2_server",
+        "x2Y": "x2_y",
+        "already_snake": "already_snake",
+        "fooÖl": "fooÖl",
+    }
+    for source, expected in vectors.items():
+        assert _to_snake_case(source) == expected
 
 
 def test_name_based_fields_sort_by_snake_case_identifier():
