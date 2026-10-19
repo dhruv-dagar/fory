@@ -55,6 +55,7 @@ from pyfory.meta.typedef import (
 )
 from pyfory.meta.typedef_encoder import (
     FIELD_NAME_ENCODER,
+    _normalize_field_name,
     encode_typedef,
     prepend_header,
     write_namespace,
@@ -222,6 +223,22 @@ class SharedDagRemotePayload:
 @dataclass
 class SharedDagLocalPayload:
     payload: List[List[List[List[pyfory.Int64]]]] = pyfory.field(ref=True)
+
+
+def test_canonical_xlang_field_name_normalization():
+    vectors = {
+        "id": "id",
+        "createdAt": "created_at",
+        "CreatedAt": "created_at",
+        "fooURL": "foo_url",
+        "URLValue": "url_value",
+        "HTTP2Server": "http2_server",
+        "x2Y": "x2_y",
+        "already_snake": "already_snake",
+        "fooÖl": "fooÖl",
+    }
+    for source, expected in vectors.items():
+        assert _normalize_field_name(source) == expected
 
 
 def test_collection_field_type():
