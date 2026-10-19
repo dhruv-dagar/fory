@@ -256,25 +256,28 @@ public class StringUtils {
     return lowerCamelToLowerUnderscore(lowerCamel);
   }
 
-  public static String lowerCamelToLowerUnderscore(String lowerCamel) {
-    StringBuilder builder = new StringBuilder();
-    int length = lowerCamel.length();
-
-    int fromIndex = 0;
-
-    for (int i = 0; i < length; i++) {
-      char symbol = lowerCamel.charAt(i);
-      if (symbol >= 'A' && symbol <= 'Z') {
-        builder.append(lowerCamel, fromIndex, i).append('_').append(Character.toLowerCase(symbol));
-        fromIndex = i + 1;
+  public static String lowerCamelToLowerUnderscore(String name) {
+    StringBuilder result = new StringBuilder(name.length() + 4);
+    for (int i = 0; i < name.length(); i++) {
+      char current = name.charAt(i);
+      if (current >= 'A' && current <= 'Z') {
+        if (i > 0) {
+          char previous = name.charAt(i - 1);
+          boolean previousLowerOrDigit =
+              (previous >= 'a' && previous <= 'z') || (previous >= '0' && previous <= '9');
+          boolean previousUpper = previous >= 'A' && previous <= 'Z';
+          boolean nextLower =
+              i + 1 < name.length() && name.charAt(i + 1) >= 'a' && name.charAt(i + 1) <= 'z';
+          if (previousLowerOrDigit || (previousUpper && nextLower)) {
+            result.append('_');
+          }
+        }
+        result.append((char) (current - 'A' + 'a'));
+      } else {
+        result.append(current);
       }
     }
-
-    if (fromIndex < length) {
-      builder.append(lowerCamel, fromIndex, length);
-    }
-
-    return builder.toString();
+    return result.toString();
   }
 
   /**
