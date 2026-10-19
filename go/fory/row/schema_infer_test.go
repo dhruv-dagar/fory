@@ -30,9 +30,16 @@ func TestLowerCamelToLowerUnderscore(t *testing.T) {
 	cases := map[string]string{
 		"id":        "id",
 		"userName":  "user_name",
-		"userID":    "user_i_d", // Java quirk, kept for parity
-		"f2":        "f2",
-		"aVeryLong": "a_very_long",
+		"userID":       "user_id",
+		"fooURL":       "foo_url",
+		"URLValue":     "url_value",
+		"HTTP2Server":  "http2_server",
+		"CreatedAt":    "created_at",
+		"x2Y":          "x2_y",
+		"already_snake": "already_snake",
+		"fooÖl":        "fooÖl",
+		"f2":           "f2",
+		"aVeryLong":    "a_very_long",
 	}
 	for in, want := range cases {
 		require.Equal(t, want, lowerCamelToLowerUnderscore(in), in)
