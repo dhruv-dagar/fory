@@ -87,6 +87,13 @@ public class StringUtilsTest extends ForyTestBase {
     assertEquals(StringUtils.lowerCamelToLowerUnderscore("someLongVariable"), "some_long_variable");
     assertEquals(StringUtils.lowerCamelToLowerUnderscore("some123variable"), "some123variable");
     assertEquals(StringUtils.lowerCamelToLowerUnderscore("someVariable123"), "some_variable123");
+    assertEquals(StringUtils.lowerCamelToLowerUnderscore("fooURL"), "foo_url");
+    assertEquals(StringUtils.lowerCamelToLowerUnderscore("URLValue"), "url_value");
+    assertEquals(StringUtils.lowerCamelToLowerUnderscore("HTTP2Server"), "http2_server");
+    assertEquals(StringUtils.lowerCamelToLowerUnderscore("CreatedAt"), "created_at");
+    assertEquals(StringUtils.lowerCamelToLowerUnderscore("x2Y"), "x2_y");
+    assertEquals(StringUtils.lowerCamelToLowerUnderscore("already_snake"), "already_snake");
+    assertEquals(StringUtils.lowerCamelToLowerUnderscore("fooÖl"), "fooÖl");
   }
 
   @Test(dataProvider = "endian")
