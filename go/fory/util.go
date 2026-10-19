@@ -59,7 +59,7 @@ func unsafeGetBytes(s string) []byte {
 
 func SnakeCase(name string) string {
 	runes := []rune(name)
-	var buf strings.Builder
+	var buf bytes.Buffer
 	buf.Grow(len(name) + 4)
 	for i, c := range runes {
 		if 'A' <= c && c <= 'Z' {
