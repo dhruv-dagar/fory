@@ -5739,12 +5739,25 @@ GeneratedFieldType(
   String _toSnakeCase(String value) {
     final buffer = StringBuffer();
     for (var index = 0; index < value.length; index += 1) {
-      final codeUnit = value.codeUnitAt(index);
-      final isUpper = codeUnit >= 65 && codeUnit <= 90;
-      if (isUpper && index > 0) {
-        buffer.write('_');
+      final current = value.codeUnitAt(index);
+      final isUpper = current >= 65 && current <= 90;
+      if (isUpper) {
+        if (index > 0) {
+          final previous = value.codeUnitAt(index - 1);
+          final previousLowerOrDigit =
+              (previous >= 97 && previous <= 122) || (previous >= 48 && previous <= 57);
+          final previousUpper = previous >= 65 && previous <= 90;
+          final nextLower = index + 1 < value.length &&
+              value.codeUnitAt(index + 1) >= 97 &&
+              value.codeUnitAt(index + 1) <= 122;
+          if (previousLowerOrDigit || (previousUpper && nextLower)) {
+            buffer.write('_');
+          }
+        }
+        buffer.writeCharCode(current + 32);
+      } else {
+        buffer.writeCharCode(current);
       }
-      buffer.write(String.fromCharCode(isUpper ? codeUnit + 32 : codeUnit));
     }
     return buffer.toString();
   }
