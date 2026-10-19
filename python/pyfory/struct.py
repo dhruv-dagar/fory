@@ -1181,24 +1181,21 @@ _UNKNOWN_TYPE_ID = -1
 
 
 def _to_snake_case(name: str) -> str:
+    """Normalize a field name using the xlang ASCII-only snake_case rules."""
     result = []
-    previous = ""
     for index, char in enumerate(name):
-        if char == "_":
-            result.append(char)
-            previous = char
-            continue
-        if char.isupper():
-            next_is_lower = index + 1 < len(name) and name[index + 1].islower()
-            previous_lower_or_digit = previous.islower() or previous.isdigit()
-            previous_upper = previous.isupper()
-            if result and result[-1] != "_" and (previous_lower_or_digit or (previous_upper and next_is_lower)):
-                result.append("_")
-            result.append(char.lower())
+        if "A" <= char <= "Z":
+            if index > 0:
+                previous = name[index - 1]
+                previous_lower_or_digit = ("a" <= previous <= "z") or ("0" <= previous <= "9")
+                previous_upper = "A" <= previous <= "Z"
+                next_lower = index + 1 < len(name) and "a" <= name[index + 1] <= "z"
+                if previous_lower_or_digit or (previous_upper and next_lower):
+                    result.append("_")
+            result.append(chr(ord(char) + ord("a") - ord("A")))
         else:
             result.append(char)
-        previous = char
-    return "".join(result).rstrip("_")
+    return "".join(result)
 
 
 def _sort_fields(type_resolver, field_names, serializers, nullable_map=None, field_infos_list=None):
