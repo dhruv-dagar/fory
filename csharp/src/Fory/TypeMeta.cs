@@ -85,24 +85,27 @@ internal static class TypeMetaUtils
             return name;
         }
 
-        Span<char> chars = name.ToCharArray();
         var sb = new System.Text.StringBuilder(name.Length + 4);
-        for (int i = 0; i < chars.Length; i++)
+        for (int i = 0; i < name.Length; i++)
         {
-            char c = chars[i];
-            if (char.IsUpper(c))
+            char c = name[i];
+            bool isUpper = c >= 'A' && c <= 'Z';
+            if (isUpper)
             {
                 if (i > 0)
                 {
-                    bool prevUpper = char.IsUpper(chars[i - 1]);
-                    bool nextUpperOrEnd = i + 1 >= chars.Length || char.IsUpper(chars[i + 1]);
-                    if (!prevUpper || !nextUpperOrEnd)
+                    char previous = name[i - 1];
+                    bool previousLowerOrDigit =
+                        (previous >= 'a' && previous <= 'z') || (previous >= '0' && previous <= '9');
+                    bool previousUpper = previous >= 'A' && previous <= 'Z';
+                    bool nextLower = i + 1 < name.Length && name[i + 1] >= 'a' && name[i + 1] <= 'z';
+                    if (previousLowerOrDigit || (previousUpper && nextLower))
                     {
                         sb.Append('_');
                     }
                 }
 
-                sb.Append(char.ToLowerInvariant(c));
+                sb.Append((char)(c - 'A' + 'a'));
             }
             else
             {
