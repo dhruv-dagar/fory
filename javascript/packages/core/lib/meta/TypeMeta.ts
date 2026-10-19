@@ -1056,27 +1056,7 @@ export class TypeMeta {
   }
 
   static toSnakeCase(name: string) {
-    const result = [];
-    const chars = Array.from(name);
-
-    for (let i = 0; i < chars.length; i++) {
-      const c = chars[i];
-      if (c >= "A" && c <= "Z") {
-        if (i > 0) {
-          const prevUpper = chars[i - 1] >= "A" && chars[i - 1] <= "Z";
-          const nextUpperOrEnd =
-            i + 1 >= chars.length || (chars[i + 1] >= "A" && chars[i + 1] <= "Z");
-
-          if (!prevUpper || !nextUpperOrEnd) {
-            result.push("_");
-          }
-        }
-        result.push(c.toLowerCase());
-      } else {
-        result.push(c);
-      }
-    }
-    return result.join("");
+    return TypeMeta.lowerCamelToLowerUnderscore(name);
   }
 
   static getFieldSortKey(i: { fieldName: string; fieldId: number }) {
