@@ -382,22 +382,5 @@ func lowerFirst(s string) string {
 // lowerCamelToLowerUnderscore ports Java StringUtils: every uppercase
 // letter becomes '_' plus its lowercase, so userID becomes user_i_d.
 func lowerCamelToLowerUnderscore(s string) string {
-	var b strings.Builder
-	from := 0
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		if c >= 'A' && c <= 'Z' {
-			b.WriteString(s[from:i])
-			b.WriteByte('_')
-			b.WriteByte(c + ('a' - 'A'))
-			from = i + 1
-		}
-	}
-	if from == 0 {
-		return s
-	}
-	if from < len(s) {
-		b.WriteString(s[from:])
-	}
-	return b.String()
+	return fory.SnakeCase(s)
 }
